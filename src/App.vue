@@ -38,7 +38,18 @@ const init_player = (my_url, danmus) => {
     screenshot: false,
     video: {
       url: my_url,
-      type: my_url.endsWith('.m3u8') ? 'hls' : 'auto',
+      type: my_url.endsWith('.m3u8') ? 'customHls' : 'auto',
+      customType: {
+            customHls: function (video, player) {
+                const hls = new Hls({
+                    // 在这里传入 hls.js 的配置项
+                    ignorePlaylistParsingErrors: true, 
+                    debug: false 
+                });
+                hls.loadSource(video.src);
+                hls.attachMedia(video);
+            },
+        },
     },
     danmaku: {
       speedRate: 1,
@@ -56,6 +67,41 @@ const search = async () => {
   if (dp) {
     dp.pause()
   }
+
+
+  if (search.startsWith('http')) {
+    if (dp) {
+    console.log('switch')
+    dp.switchVideo(
+      {
+        url: search,
+
+        type: search.endsWith('.m3u8') ? 'customHls' : 'auto',
+      customType: {
+            customHls: function (video, player) {
+                const hls = new Hls({
+                    // 在这里传入 hls.js 的配置项
+                    ignorePlaylistParsingErrors: true, 
+                    debug: false 
+                });
+                hls.loadSource(video.src);
+                hls.attachMedia(video);
+            },
+        },
+        
+      },
+      {
+        addition: [
+         
+        ],
+      },
+    )
+    dp.play()
+  }
+    return
+  }
+
+
   const Loading = ElLoading.service({
     lock: true,
     // text: 'Loading',
